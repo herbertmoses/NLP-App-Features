@@ -4,8 +4,9 @@ import pickle
 import ast  # To safely parse string representations of tuples/lists
 
 app = Flask(__name__)
-model = pickle.load(open('model.pkl', 'rb'))
-
+# model = pickle.load(open('model.pkl', 'rb'))
+with open("model.pkl", "rb") as f:
+    model = pickle.load(f)
 @app.route('/')
 def home():
     return render_template('index.html')
