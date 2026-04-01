@@ -10,6 +10,11 @@
     <div class="card">
       <div class="logo"></div>
       <h1>Top Trending App Features</h1>
+        {% if deployment_message %}
+            <p style="color:green; font-weight:bold;">
+                {{ deployment_message }}
+            </p>
+    {% endif %}
       <form action="{{ url_for('predict') }}" method="post">
         <label for="Category">Choose App Category</label>
         <select id="Category" name="Category">

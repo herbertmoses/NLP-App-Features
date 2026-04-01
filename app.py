@@ -3,13 +3,14 @@ from flask import Flask, request, render_template
 import pickle
 import ast  # To safely parse string representations of tuples/lists
 
+deployment_message = "Azure DevOps CI/CD Deployment Successful!"
 app = Flask(__name__)
 # model = pickle.load(open('model.pkl', 'rb'))
 with open("model.pkl", "rb") as f:
     model = pickle.load(f)
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', deployment_message=deployment_message)
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -28,7 +29,7 @@ def predict():
         parsed_tuples = [("Error parsing prediction", str(e))]
 
     # Pass parsed data to the template
-    return render_template('index.html', prediction_text=parsed_tuples)
+    return render_template('index.html', prediction_text=parsed_tuples, deployment_message=deployment_message)
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
