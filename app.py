@@ -6,7 +6,7 @@ from utils import parse_prediction, chunk_list
 from services.model_service import ModelService
 from data.categories import CATEGORIES
 
-deployment_message = "Azure DevOps CI/CD Deployment Successful!"
+# deployment_message = "Azure DevOps CI/CD Deployment Successful!"
 
 app = Flask(__name__)
 app.config.from_object(Config)
