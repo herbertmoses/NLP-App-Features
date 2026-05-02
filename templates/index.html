@@ -10,35 +10,30 @@
     <div class="card">
       <div class="logo"></div>
       <h1>Top Trending App Features</h1>
-        {% if deployment_message %}
-            <p style="color:green; font-weight:bold;">
-                {{ deployment_message }}
-            </p>
-    {% endif %}
+
+      {% if deployment_message %}
+      <p style="color:green; font-weight:bold;">
+        {{ deployment_message }}
+      </p>
+      {% endif %}
+
       <form action="{{ url_for('predict') }}" method="post">
         <label for="Category">Choose App Category</label>
         <select id="Category" name="Category">
-          {% set categories = [
-            'Arts&Design', 'Auto&Vehicles', 'Beauty', 'Books&Reference', 'Business',
-            'Comics', 'Communication', 'Dating', 'Education', 'Entertainment', 'Events',
-            'Finance', 'Food&Drink', 'Health&Fitness', 'House&Home', 'Libraries&Demo',
-            'Lifestyle', 'Maps&Navigation', 'Medical', 'Music&Audio', 'News&Magazines',
-            'Parenting', 'Personalization', 'Photography', 'Productivity', 'Shopping',
-            'Social', 'Sports', 'Tools', 'Travel&Local', 'Video Players & Editors', 'Weather'
-          ] %}
           {% for cat in categories %}
           <option value="{{ loop.index0 }}">{{ cat }}</option>
           {% endfor %}
         </select>
+
         <button type="submit">Submit</button>
       </form>
 
-      {% if prediction_text %}
+      {% if results %}
       <div class="result-section">
         <h2>Top Features</h2>
-        {% set chunk_size = 10 %}
+
         <div class="result-grid">
-          {% for i in range(0, prediction_text|length, chunk_size) %}
+          {% for table in results %}
           <div class="result-table">
             <table>
               <thead>
@@ -49,9 +44,9 @@
                 </tr>
               </thead>
               <tbody>
-                {% for feature, count in prediction_text[i:i+chunk_size] %}
+                {% for feature, count in table %}
                 <tr>
-                  <td>{{ i + loop.index }}</td>
+                  <td>{{ loop.index }}</td>
                   <td>{{ feature }}</td>
                   <td>{{ count }}</td>
                 </tr>
@@ -63,6 +58,7 @@
         </div>
       </div>
       {% endif %}
+
     </div>
   </div>
 </body>

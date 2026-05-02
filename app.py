@@ -1,37 +1,71 @@
-import numpy as np
+import logging
 from flask import Flask, request, render_template
-import pickle
-import ast  # To safely parse string representations of tuples/lists
+
+from config import Config
+from utils import parse_prediction, chunk_list
+from services.model_service import ModelService
+from data.categories import CATEGORIES
 
 deployment_message = "Azure DevOps CI/CD Deployment Successful!"
+
 app = Flask(__name__)
-# model = pickle.load(open('model.pkl', 'rb'))
-with open("model.pkl", "rb") as f:
-    model = pickle.load(f)
+app.config.from_object(Config)
+
+# Logging setup
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize service
+model_service = ModelService(Config.MODEL_PATH)
+
+
 @app.route('/')
 def home():
-    return render_template('index.html', deployment_message=deployment_message)
+    logger.info("Rendering home page")
+    return render_template(
+        'index.html',
+        categories=CATEGORIES,
+        deployment_message=deployment_message
+    )
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Convert form inputs to float
-    float_features = [float(x) for x in request.form.values()]
-    final_features = [np.array(float_features)]
-
-    # Get prediction from model
-    prediction = model.predict(final_features)
-
-    # Parse the stringified list of tuples (e.g., from NumPy array)
-    prediction_list_str = prediction[0]  # First string in array
     try:
-        parsed_tuples = ast.literal_eval(prediction_list_str)
-    except Exception as e:
-        parsed_tuples = [("Error parsing prediction", str(e))]
+        # Input processing
+        float_features = [float(x) for x in request.form.values()]
+        logger.info(f"Received input: {float_features}")
 
-    # Pass parsed data to the template
-    return render_template('index.html', prediction_text=parsed_tuples, deployment_message=deployment_message)
+        # Model prediction
+        prediction = model_service.predict(float_features)
+        logger.info(f"Raw prediction: {prediction}")
+
+        # Parsing
+        parsed_tuples = parse_prediction(prediction)
+
+        # Chunking
+        chunked_results = chunk_list(parsed_tuples, chunk_size=Config.CHUNK_SIZE)
+
+        return render_template(
+            'index.html',
+            categories=CATEGORIES,
+            results=chunked_results,
+            deployment_message=deployment_message
+        )
+
+    except Exception as e:
+        logger.error(f"Error during prediction: {str(e)}")
+
+        return render_template(
+            'index.html',
+            categories=CATEGORIES,
+            results=[[("Error", str(e))]],
+            deployment_message="Something went wrong"
+        )
+
 
 if __name__ == "__main__":
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=Config.DEBUG, use_reloader=False)
 
+# Azure entry point
 application = app
