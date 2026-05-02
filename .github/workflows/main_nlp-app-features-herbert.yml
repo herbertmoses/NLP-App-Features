@@ -64,10 +64,10 @@ jobs:
         with:
           name: python-app
       
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
-        with:
-          app-name: 'nlp-app-features-herbert'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E5478B2FE61F4B13999C7F27B304A86A }}
+      # - name: 'Deploy to Azure Web App'
+      #   uses: azure/webapps-deploy@v3
+      #   id: deploy-to-webapp
+      #   with:
+      #     app-name: 'nlp-app-features-herbert'
+      #     slot-name: 'Production'
+      #     publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E5478B2FE61F4B13999C7F27B304A86A }}
